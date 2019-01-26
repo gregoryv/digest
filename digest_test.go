@@ -10,7 +10,8 @@ func Test_parsing_wwwAuth(t *testing.T) {
 	assert := asserter.New(t)
 	for _, txt := range []string{
 		`Digest realm="x", nonce="y", algorithm=SHA256, qop="auth"`,
-		"",
+		`Basic realm="x", nonce="y", algorithm=SHA256, qop="auth"`,
+		``,
 	} {
 		err := NewAuth("", "").Parse(txt)
 		assert(err != nil).Fail()
