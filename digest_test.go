@@ -1,22 +1,52 @@
 package digest
 
 import (
+	"fmt"
 	"testing"
+
+	_ "golang.org/x/crypto/blake2b"
+	_ "golang.org/x/crypto/blake2s"
+	_ "golang.org/x/crypto/md4"
+	_ "golang.org/x/crypto/ripemd160"
+	_ "golang.org/x/crypto/sha3"
 
 	"github.com/gregoryv/asserter"
 )
 
 func Test_parsing_wwwAuth(t *testing.T) {
 	assert := asserter.New(t)
-	for _, txt := range []string{
-		`Digest realm="x", nonce="y", algorithm=SHA3_384, qop="auth"`,
+	unsupported := []string{
 		`Basic realm="x", nonce="y", algorithm=SHA256, qop="auth"`,
+		`Digest realm="x", nonce="y", algorithm=FUNKYSTUFF, qop="auth"`,
 		``,
-	} {
+	}
+	for _, txt := range unsupported {
 		err := NewAuth("", "").Parse(txt)
-		t.Log(err)
 		assert(err != nil).Errorf("%s should fail", txt)
 	}
+
+	supportedAlgorithms := []string{"MD4",
+		"MD5",
+		"SHA1",
+		"SHA224",
+		"SHA256",
+		"SHA384",
+		"SHA512",
+		"RIPEMD160",
+		"SHA3_224",
+		"SHA3_256",
+		"SHA3_384",
+		"SHA3_512",
+		"SHA512_224",
+		"SHA512_256",
+	}
+	format := `Digest realm="x", nonce="y", algorithm=%s, qop="auth"`
+	for _, alg := range supportedAlgorithms {
+		txt := fmt.Sprintf(format, alg)
+		err := NewAuth("", "").Parse(txt)
+		assert(err == nil).Errorf("%s should be ok: %s", txt, err)
+	}
+
 }
 
 func TestFindVal(t *testing.T) {

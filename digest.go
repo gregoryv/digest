@@ -77,16 +77,6 @@ func (auth *Auth) Parse(authHeader string) error {
 	return nil
 }
 
-func parseHash(alg string) (h crypto.Hash) {
-	switch alg {
-	case "MD5":
-		h = crypto.MD5
-	case "SHA256":
-		h = crypto.SHA256
-	}
-	return
-}
-
 func (auth *Auth) Header(method, uri string) string {
 	auth.method = method
 	auth.uri = uri
