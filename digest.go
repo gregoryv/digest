@@ -23,7 +23,7 @@ Example:
 package digest
 
 import (
-	"crypto/md5"
+	"crypto"
 	"crypto/rand"
 	"fmt"
 	"io"
@@ -37,6 +37,7 @@ func NewAuth(username, pwd string) *Auth {
 		pwd:      pwd,
 		nc:       1,
 		cnonce:   newNonce(),
+		hash:     crypto.MD5,
 	}
 }
 
@@ -44,6 +45,7 @@ type Auth struct {
 	method, uri, username, pwd        string
 	realm, nonce, qop, cnonce, opaque string
 	nc                                int
+	hash                              crypto.Hash
 }
 
 func (auth *Auth) Authorize(req *http.Request) {
@@ -62,14 +64,27 @@ func (auth *Auth) Parse(authHeader string) error {
 	}
 	params := parseValues(authHeader[i:])
 	alg := params["algorithm"]
-	if alg != "MD5" {
-		return fmt.Errorf("Unknown algorithm %q", alg)
+
+	auth.hash = parseHash(alg)
+	if !auth.hash.Available() {
+		return fmt.Errorf("Unknown algorithm: %s", alg)
 	}
+
 	auth.nonce = params["nonce"]
 	auth.realm = params["realm"]
 	auth.opaque = params["opaque"]
 	auth.qop = params["qop"]
 	return nil
+}
+
+func parseHash(alg string) (h crypto.Hash) {
+	switch alg {
+	case "MD5":
+		h = crypto.MD5
+	case "SHA256":
+		h = crypto.SHA256
+	}
+	return
 }
 
 func (auth *Auth) Header(method, uri string) string {
@@ -92,15 +107,17 @@ func (auth *Auth) Header(method, uri string) string {
 }
 
 func (auth *Auth) response() string {
-	ha1 := md5f("%s:%s:%s", auth.username, auth.realm, auth.pwd)
-	ha2 := md5f("%s:%s", auth.method, auth.uri)
-	return md5f("%s:%s:%08v:%s:%s:%s",
-		ha1, auth.nonce, auth.nc, auth.cnonce, auth.qop, ha2)
-}
+	h := auth.hash.New()
+	fmt.Fprintf(h, "%s:%s:%s", auth.username, auth.realm, auth.pwd)
+	ha1 := fmt.Sprintf("%x", h.Sum(nil))
+	h.Reset()
 
-func md5f(tmpl string, args ...interface{}) string {
-	h := md5.New()
-	fmt.Fprintf(h, tmpl, args...)
+	fmt.Fprintf(h, "%s:%s", auth.method, auth.uri)
+	ha2 := fmt.Sprintf("%x", h.Sum(nil))
+	h.Reset()
+
+	fmt.Fprintf(h, "%s:%s:%08v:%s:%s:%s",
+		ha1, auth.nonce, auth.nc, auth.cnonce, auth.qop, ha2)
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
