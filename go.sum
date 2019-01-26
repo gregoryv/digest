@@ -1,0 +1,9 @@
+github.com/gregoryv/asserter v0.0.0-20190113151027-b6bfcdf82e90/go.mod h1:iLD46IKZjjleTkmDikemRaDZQldDrq8uwTnygV/hC/M=
+github.com/gregoryv/ex v0.0.0-20190111110949-c25c62173819 h1:G41YinWab2vRU2mU/UfVLZbwZ5r0zHmFjyOW+o9kCyM=
+github.com/gregoryv/ex v0.0.0-20190111110949-c25c62173819/go.mod h1:JReihQXAQJqww4sYJcOLkGX1oB0B1cFXKcX+9xrVYME=
+github.com/gregoryv/logger v0.0.0-20190126053710-aad4e4a6a444 h1:SkZsTfAVe+YDS5u5a6u10I1WbUSr4wjfDZZLrtKQ+fk=
+github.com/gregoryv/logger v0.0.0-20190126053710-aad4e4a6a444/go.mod h1:/dc6pRKnuzDcajoaxnoat7rYs7jQrvBsTNPF/QgB1wc=
+github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
+github.com/mattn/go-isatty v0.0.4/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
+github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b/go.mod h1:01TrycV0kFyexm33Z7vhZRXopbI8J3TDReVlkTgMUxE=
+github.com/mgutz/logxi v0.0.0-20161027140823-aebf8a7d67ab/go.mod h1:y1pL58r5z2VvAjeG1VLGc8zOQgSOzbKN7kMHPvFXJ+8=
