@@ -24,12 +24,12 @@ type Auth struct {
 	nc                                int
 }
 
-func (da *Auth) Authorize(req *http.Request) {
-	da.nc++
-	req.Header.Set("Authorization", da.Header(req.Method, req.URL.Path))
+func (auth *Auth) Authorize(req *http.Request) {
+	auth.nc++
+	req.Header.Set("Authorization", auth.Header(req.Method, req.URL.Path))
 }
 
-func (da *Auth) Parse(authHeader string) error {
+func (auth *Auth) Parse(authHeader string) error {
 	i := strings.Index(authHeader, " ")
 	if i == -1 {
 		return fmt.Errorf("Bad authHeader string")
@@ -43,37 +43,37 @@ func (da *Auth) Parse(authHeader string) error {
 	if alg != "MD5" {
 		return fmt.Errorf("Unknown algorithm %q", alg)
 	}
-	da.nonce = params["nonce"]
-	da.realm = params["realm"]
-	da.opaque = params["opaque"]
-	da.qop = params["qop"]
+	auth.nonce = params["nonce"]
+	auth.realm = params["realm"]
+	auth.opaque = params["opaque"]
+	auth.qop = params["qop"]
 	return nil
 }
 
-func (da *Auth) Header(method, uri string) string {
-	da.method = method
-	da.uri = uri
+func (auth *Auth) Header(method, uri string) string {
+	auth.method = method
+	auth.uri = uri
 	qVar := ""
-	if da.opaque != "" {
-		qVar = fmt.Sprintf(", opaque=%q", da.opaque)
+	if auth.opaque != "" {
+		qVar = fmt.Sprintf(", opaque=%q", auth.opaque)
 	}
 	return fmt.Sprintf(
 		"Digest %s=%q, %s=%q, %s=%q, %s=%q, %s=%s, %s=%08v, %s=%q, %s=%q%s",
-		"username", da.username,
-		"realm", da.realm,
-		"nonce", da.nonce,
-		"uri", da.uri,
-		"qop", da.qop,
-		"nc", da.nc,
-		"cnonce", da.cnonce,
-		"response", da.response(), qVar)
+		"username", auth.username,
+		"realm", auth.realm,
+		"nonce", auth.nonce,
+		"uri", auth.uri,
+		"qop", auth.qop,
+		"nc", auth.nc,
+		"cnonce", auth.cnonce,
+		"response", auth.response(), qVar)
 }
 
-func (da *Auth) response() string {
-	ha1 := md5f("%s:%s:%s", da.username, da.realm, da.pwd)
-	ha2 := md5f("%s:%s", da.method, da.uri)
+func (auth *Auth) response() string {
+	ha1 := md5f("%s:%s:%s", auth.username, auth.realm, auth.pwd)
+	ha2 := md5f("%s:%s", auth.method, auth.uri)
 	return md5f("%s:%s:%08v:%s:%s:%s",
-		ha1, da.nonce, da.nc, da.cnonce, da.qop, ha2)
+		ha1, auth.nonce, auth.nc, auth.cnonce, auth.qop, ha2)
 }
 
 func md5f(tmpl string, args ...interface{}) string {

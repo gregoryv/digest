@@ -2,13 +2,18 @@ package digest
 
 import (
 	"testing"
+
+	"github.com/gregoryv/asserter"
 )
 
 func Test_parsing_wwwAuth(t *testing.T) {
-	a := NewAuth("", "")
-	err := a.Parse(`Digest realm="x", nonce="y", algorithm=SHA256, qop="auth"`)
-	if err == nil {
-		t.Fail()
+	assert := asserter.New(t)
+	for _, txt := range []string{
+		`Digest realm="x", nonce="y", algorithm=SHA256, qop="auth"`,
+		"",
+	} {
+		err := NewAuth("", "").Parse(txt)
+		assert(err != nil).Fail()
 	}
 }
 
