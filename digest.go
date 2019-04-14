@@ -48,11 +48,16 @@ type Auth struct {
 	hash                              crypto.Hash
 }
 
+// Authorize sets the Authorization header on the given request.
+// Also each call updates nc by one.
 func (auth *Auth) Authorize(req *http.Request) {
 	auth.nc++
 	req.Header.Set("Authorization", auth.Header(req.Method, req.URL.Path))
 }
 
+// Parse parses the WWW-Authenticate header value. Once correctly
+// parsed use the Authorize func to set the response header on a
+// subsequent request.
 func (auth *Auth) Parse(authHeader string) error {
 	i := strings.Index(authHeader, " ")
 	if i == -1 {
@@ -80,20 +85,29 @@ func (auth *Auth) Parse(authHeader string) error {
 func (auth *Auth) Header(method, uri string) string {
 	auth.method = method
 	auth.uri = uri
-	qVar := ""
-	if auth.opaque != "" {
-		qVar = fmt.Sprintf(", opaque=%q", auth.opaque)
+
+	f := make([]string, 0)
+	f = append(f, fmt.Sprintf("username=%q", auth.username))
+	f = append(f, fmt.Sprintf("realm=%q", auth.realm))
+	f = append(f, fmt.Sprintf("nonce=%q", auth.nonce))
+	f = append(f, fmt.Sprintf("uri=%q", auth.uri))
+	if auth.useQualityOfProtection() {
+		f = append(f, fmt.Sprintf("qop=%s", auth.qop))
 	}
-	return fmt.Sprintf(
-		"Digest %s=%q, %s=%q, %s=%q, %s=%q, %s=%s, %s=%08v, %s=%q, %s=%q%s",
-		"username", auth.username,
-		"realm", auth.realm,
-		"nonce", auth.nonce,
-		"uri", auth.uri,
-		"qop", auth.qop,
-		"nc", auth.nc,
-		"cnonce", auth.cnonce,
-		"response", auth.response(), qVar)
+	f = append(f, fmt.Sprintf("nc=%08v", auth.nc))
+	if auth.useQualityOfProtection() {
+		f = append(f, fmt.Sprintf("cnonce=%q", auth.cnonce))
+	}
+	f = append(f, fmt.Sprintf("response=%q", auth.response()))
+	if auth.opaque != "" {
+		f = append(f, fmt.Sprintf("opaque=%q", auth.opaque))
+	}
+	return "Digest " + strings.Join(f, ", ")
+}
+
+// Described in https://tools.ietf.org/html/rfc2617#page-12
+func (auth *Auth) useQualityOfProtection() bool {
+	return auth.qop != ""
 }
 
 func (auth *Auth) response() string {

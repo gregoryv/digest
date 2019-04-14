@@ -2,6 +2,7 @@ package digest
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	_ "golang.org/x/crypto/blake2b"
@@ -78,5 +79,15 @@ func TestParseValues(t *testing.T) {
 		if res[k] != v {
 			t.Errorf("Expect %s=%s, got %s", k, v, res[k])
 		}
+	}
+}
+
+func TestAuth_Header_without_qop(t *testing.T) {
+	txt := `Digest realm="x", nonce="y", algorithm=MD5`
+	auth := NewAuth("", "")
+	auth.Parse(txt)
+	got := auth.Header("GET", "http://example.com")
+	if strings.Index(got, "qop=") != -1 {
+		t.Errorf("Found qop=... in %s", got)
 	}
 }
