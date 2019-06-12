@@ -1,7 +1,6 @@
 /* Package provides header generator for digest authentication.
 
-The Auth object can be reused for subsequent requests thought it is
-not thread safe.
+The Auth object can be reused for subsequent requests.
 
 Example:
 
@@ -29,6 +28,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"sync/atomic"
 )
 
 func NewAuth(username, pwd string) *Auth {
@@ -44,14 +44,14 @@ func NewAuth(username, pwd string) *Auth {
 type Auth struct {
 	method, uri, username, pwd        string
 	realm, nonce, qop, cnonce, opaque string
-	nc                                int
+	nc                                int32
 	hash                              crypto.Hash
 }
 
 // Authorize sets the Authorization header on the given request.
 // Also each call updates nc by one.
 func (auth *Auth) Authorize(req *http.Request) {
-	auth.nc++
+	atomic.AddInt32(&auth.nc, 1)
 	req.Header.Set("Authorization", auth.Header(req.Method, req.URL.Path))
 }
 
