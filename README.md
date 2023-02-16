@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/gregoryv/digest.svg?branch=master)](https://travis-ci.org/gregoryv/digest)
-[![codecov](https://codecov.io/gh/gregoryv/digest/branch/master/graph/badge.svg)](https://codecov.io/gh/gregoryv/digest)
+![](https://github.com/gregoryv/digest/actions/workflows/build.yml/badge.svg)
 
 [digest](https://godoc.org/github.com/gregoryv/digest) - package provides header generator for digest authentication.
 
