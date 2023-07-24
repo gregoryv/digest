@@ -54,7 +54,6 @@ func (a *Auth) SetHash(v crypto.Hash) {
 	a.hash = v
 }
 
-
 // Authorize sets the Authorization header on the given request.
 // Also each call updates nc by one.
 func (auth *Auth) Authorize(req *http.Request) {

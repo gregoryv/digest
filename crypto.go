@@ -7,6 +7,7 @@ import (
 
 func parseHash(alg string) (h crypto.Hash) {
 	alg = strings.ToUpper(alg)
+	alg = strings.Replace(alg, "SHA-", "SHA", 1)
 	switch alg {
 	case "MD4":
 		h = crypto.MD4
