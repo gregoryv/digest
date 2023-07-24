@@ -48,6 +48,13 @@ type Auth struct {
 	hash                              crypto.Hash
 }
 
+// SetHash to use during authorization. Auth.Parse tries to guess it
+// from the algorithm but when that fails you override it.
+func (a *Auth) SetHash(v crypto.Hash) {
+	a.hash = v
+}
+
+
 // Authorize sets the Authorization header on the given request.
 // Also each call updates nc by one.
 func (auth *Auth) Authorize(req *http.Request) {
