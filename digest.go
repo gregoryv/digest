@@ -1,23 +1,24 @@
-/* Package provides header generator for digest authentication.
+/*
+	Package provides header generator for digest authentication.
 
 The Auth object can be reused for subsequent requests.
 
 Example:
 
-    req, _ := http.NewRequest("GET", "/", nil)
-    resp, _ := http.DefaultClient.Do(req)
-    if resp.StatusCode == http.StatusUnauthorized {
-        auth := NewAuth("john.doe", "secret")
-        err := auth.Parse(resp.Header.Get("www-authenticate"))
-        if err != nil {
-            // cannot authenticate using this package
-        }
-        auth.Authorize(req)
-    }
-    resp, _ := http.DefaultClient.Do(req)
+	req, _ := http.NewRequest("GET", "/", nil)
+	resp, _ := http.DefaultClient.Do(req)
+	if resp.StatusCode == http.StatusUnauthorized {
+	    auth := NewAuth("john.doe", "secret")
+	    err := auth.Parse(resp.Header.Get("www-authenticate"))
+	    if err != nil {
+	        // cannot authenticate using this package
+	    }
+	    auth.Authorize(req)
+	}
+	resp, _ := http.DefaultClient.Do(req)
 
-    // and for the next request just authorize it before sending
-    auth.Authorize(req2)
+	// and for the next request just authorize it before sending
+	auth.Authorize(req2)
 */
 package digest
 
