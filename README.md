@@ -4,12 +4,11 @@
 
 ## Quick start
 
-    go get -u github.com/gregoryv/digest
+    go get github.com/gregoryv/digest
 
 ## Example
 
-The Auth object can be reused for subsequent requests thought it is
-not thread safe.
+The Auth object can be reused for subsequent requests.
 
     req, _ := http.NewRequest("GET", "/", nil)
     resp, _ := http.DefaultClient.Do(req)
